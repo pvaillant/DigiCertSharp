@@ -1,0 +1,798 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "Digicert Retail API"
+  },
+  "host": "api.digicert.com",
+  "externalDocs": {
+    "url": "https://www.digicert.com/clients/rest/docs/retail/"
+  },
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic",
+      "description": "username is the account_id and api_key is the password"
+    }
+  },
+  "security": [
+    {
+      "basic": []
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/vnd.digicert.rest-v1+json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/order/ssl": {
+      "post": {
+        "operationId": "OrderCertificate",
+        "description": "Create a pending order for a new SSL Certificate",
+        "tags": [
+          "Order"
+        ],
+        "externalDocs": {
+          "url": "https://www.digicert.com/clients/rest/docs/retail/order/ssl-certificate"
+        },
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CertificateOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "schema": {
+              "title": "CertificateOrderResponse",
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/vnd.digicert.rest-v1+json": {
+                "order_id": "00222307"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{order_id}": {
+      "get": {
+        "operationId": "GetOrder",
+        "description": "View order status and other details",
+        "tags": [
+          "Order Details"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "/^\\d+$/"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/OrderDetail"
+            }
+          },
+          "default": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Errors"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "ReissueCertificate",
+        "description": "Updates the certificate based on the provided information. Rekeying a certificate is accomplishjed by the key being the only change made.",
+        "tags": [
+          "Reissue"
+        ],
+        "parameters": [
+          {
+            "name": "X-HTTP-Method-Override",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "default": "REISSUE",
+            "enum": [
+              "REISSUE"
+            ]
+          },
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "/^\\d+$/"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReissueCertificateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ReissueCertificateResponse"
+            }
+          },
+          "default": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Errors"
+            }
+          }
+        }
+      }
+    },
+    "/order/{order_id}/certificate": {
+      "get": {
+        "operationId": "GetIssuedCertificate",
+        "description": "Retrieve the certificate once the order has been processed and certificate issued",
+        "tags": [
+          "Retrieve Certificate"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "/^\\d+$/"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/IssuedCertificate"
+            }
+          },
+          "default": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Errors"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Errors": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "example": "{\n  \"errors\":[\n      {\n      \"code\":\"required_param:note\",\n      \"description\":\"Note is required\"\n      }\n  ]\n}\n"
+    },
+    "CertificateOrderRequest": {
+      "required": [
+        "csr",
+        "validity",
+        "org_name",
+        "org_addr1",
+        "org_city",
+        "org_state",
+        "org_zip",
+        "org_country",
+        "org_contact_firstname",
+        "org_contact_lastname",
+        "org_contact_email",
+        "org_contact_telephone"
+      ],
+      "type": "object",
+      "properties": {
+        "csr": {
+          "type": "string",
+          "description": "Certificate Signing Request",
+          "externalDocs": {
+            "url": "https://www.digicert.com/csr-creation.htm"
+          }
+        },
+        "validity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 1,
+          "description": "Certificate validity length in years. For EV certificates, only 1 and 2 year lengths are allowed."
+        },
+        "common_name": {
+          "type": "string",
+          "description": "The name to be secured in the certificate. Decoded from CSR if not provided."
+        },
+        "sans": {
+          "type": "string",
+          "description": "A comma delimited list of subject alternative names to be secured in the certificate. Adding SANs names incurs additional cost. Decoded from CSR if not provided."
+        },
+        "server_type": {
+          "type": "number",
+          "default": -1,
+          "description": "See server types. Absent or invalid values default to Other.",
+          "externalDocs": {
+            "url": "https://www.digicert.com/clients/rest/docs/retail/appendix/server-types"
+          }
+        },
+        "org_unit": {
+          "type": "string",
+          "description": "This is the OU field to be included in the certificate."
+        },
+        "org_name": {
+          "type": "string",
+          "description": "Name of organization which owns common name."
+        },
+        "org_addr1": {
+          "type": "string",
+          "description": "Address line 1 of the organization's address."
+        },
+        "org_addr2": {
+          "type": "string",
+          "description": "Address line 2 of the organization's address."
+        },
+        "org_city": {
+          "type": "string",
+          "description": "City of organization's address."
+        },
+        "org_state": {
+          "type": "string",
+          "description": "State / Province of the organization's address."
+        },
+        "org_zip": {
+          "type": "string",
+          "description": "Zip or Postal code of the organization's address."
+        },
+        "org_country": {
+          "type": "string",
+          "description": "A two character, lowercase abbreviation for country.",
+          "enum": [
+            "ad",
+            "ae",
+            "af",
+            "ag",
+            "ai",
+            "al",
+            "am",
+            "an",
+            "ao",
+            "aq",
+            "ar",
+            "as",
+            "at",
+            "au",
+            "aw",
+            "ax",
+            "az",
+            "ba",
+            "bb",
+            "bd",
+            "be",
+            "bf",
+            "bg",
+            "bh",
+            "bi",
+            "bj",
+            "bl",
+            "bm",
+            "bn",
+            "bo",
+            "bq",
+            "br",
+            "bs",
+            "bt",
+            "bv",
+            "bw",
+            "by",
+            "bz",
+            "ca",
+            "cc",
+            "cd",
+            "cf",
+            "cg",
+            "ch",
+            "ci",
+            "ck",
+            "cl",
+            "cm",
+            "cn",
+            "co",
+            "cr",
+            "cv",
+            "cw",
+            "cx",
+            "cy",
+            "cz",
+            "de",
+            "dj",
+            "dk",
+            "dm",
+            "do",
+            "dz",
+            "ec",
+            "ee",
+            "eg",
+            "eh",
+            "er",
+            "es",
+            "et",
+            "fi",
+            "fj",
+            "fk",
+            "fm",
+            "fo",
+            "fr",
+            "ga",
+            "gb",
+            "gd",
+            "ge",
+            "gf",
+            "gg",
+            "gh",
+            "gi",
+            "gl",
+            "gm",
+            "gn",
+            "gp",
+            "gq",
+            "gr",
+            "gs",
+            "gt",
+            "gu",
+            "gw",
+            "gy",
+            "hk",
+            "hm",
+            "hn",
+            "hr",
+            "ht",
+            "hu",
+            "id",
+            "ie",
+            "il",
+            "im",
+            "in",
+            "io",
+            "iq",
+            "is",
+            "it",
+            "je",
+            "jm",
+            "jo",
+            "jp",
+            "ke",
+            "kg",
+            "kh",
+            "ki",
+            "km",
+            "kn",
+            "kr",
+            "kw",
+            "ky",
+            "kz",
+            "la",
+            "lb",
+            "lc",
+            "li",
+            "lk",
+            "lr",
+            "ls",
+            "lt",
+            "lu",
+            "lv",
+            "ly",
+            "ma",
+            "mc",
+            "md",
+            "me",
+            "mf",
+            "mg",
+            "mh",
+            "mk",
+            "ml",
+            "mm",
+            "mn",
+            "mo",
+            "mp",
+            "mq",
+            "mr",
+            "ms",
+            "mt",
+            "mu",
+            "mv",
+            "mw",
+            "mx",
+            "my",
+            "mz",
+            "na",
+            "nc",
+            "ne",
+            "nf",
+            "ng",
+            "ni",
+            "nl",
+            "no",
+            "np",
+            "nr",
+            "nu",
+            "nz",
+            "om",
+            "pa",
+            "pe",
+            "pf",
+            "pg",
+            "ph",
+            "pk",
+            "pl",
+            "pm",
+            "pn",
+            "pr",
+            "ps",
+            "pt",
+            "pw",
+            "py",
+            "qa",
+            "re",
+            "ro",
+            "rs",
+            "ru",
+            "rw",
+            "sa",
+            "sb",
+            "sc",
+            "se",
+            "sg",
+            "sh",
+            "si",
+            "sj",
+            "sk",
+            "sl",
+            "sm",
+            "sn",
+            "so",
+            "sr",
+            "ss",
+            "st",
+            "sv",
+            "sx",
+            "sz",
+            "tc",
+            "td",
+            "tf",
+            "tg",
+            "th",
+            "tj",
+            "tk",
+            "tl",
+            "tm",
+            "tn",
+            "to",
+            "tr",
+            "tt",
+            "tv",
+            "tw",
+            "tz",
+            "ua",
+            "ug",
+            "um",
+            "us",
+            "uy",
+            "uz",
+            "va",
+            "vc",
+            "ve",
+            "vg",
+            "vi",
+            "vn",
+            "vu",
+            "wf",
+            "ws",
+            "ye",
+            "yt",
+            "za",
+            "zm",
+            "zw"
+          ],
+          "externalDocs": {
+            "url": "https://www.digicert.com/clients/rest/docs/retail/appendix/country-codes"
+          }
+        },
+        "telephone": {
+          "type": "string",
+          "format": "numericstring",
+          "description": "Main telephone number of the organization. Required for EV certificates."
+        },
+        "org_contact_job_title": {
+          "type": "string",
+          "description": "Title of contact working at the organization."
+        },
+        "org_contact_firstname": {
+          "type": "string",
+          "description": "First name of the organization contact."
+        },
+        "org_contact_lastname": {
+          "type": "string",
+          "description": "Last name of the organization contact."
+        },
+        "org_contact_email": {
+          "type": "string",
+          "description": "Email address of the organization contact."
+        },
+        "org_contact_telephone": {
+          "type": "string",
+          "description": "Telephone number of the organization contact."
+        },
+        "org_contact_telephone_ext": {
+          "type": "string",
+          "description": "Extension number of the organization contact."
+        },
+        "ev": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ReissueCertificateRequest": {
+      "type": "object",
+      "properties": {
+        "csr": {
+          "type": "string",
+          "description": "Certificate Signing Request."
+        },
+        "common_name": {
+          "type": "string",
+          "description": "The name to be secured in the certificate."
+        },
+        "sans": {
+          "type": "string",
+          "description": "Subject Alternative Names. A comma delimited list of names to be secured in the certificate."
+        },
+        "server_type": {
+          "type": "string",
+          "description": "Server platform. Defaults to server_type of order."
+        },
+        "comments": {
+          "type": "string",
+          "description": "Notes about this order for customer's internal use."
+        }
+      }
+    },
+    "ReissueCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "pending_name_changes": {
+          "type": "object",
+          "description": "Details of name changes (if any) are listed in this collection.",
+          "properties": {
+            "added_names": {
+              "type": "array",
+              "description": "Any added names are listed here.",
+              "items": {
+                "type": "string",
+                "description": "A name to be added in the reissue",
+                "xml": {
+                  "name": "added_name"
+                }
+              }
+            },
+            "dropped_names": {
+              "type": "array",
+              "description": "Any removed names are listed here.",
+              "items": {
+                "type": "string",
+                "description": "A name to be removed in the reissue",
+                "xml": {
+                  "name": "dropped_name"
+                }
+              }
+            }
+          }
+        },
+        "rejected_reissue": {
+          "type": "object",
+          "description": "Details of the rejected reissue (if any) are listed here.",
+          "properties": {
+            "common_name": {
+              "type": "string",
+              "description": "The Common Name of the rejected reissue request."
+            },
+            "sans": {
+              "type": "array",
+              "description": "The list of SANs in the rejected reissue.",
+              "items": {
+                "type": "string",
+                "description": "Subject Alternative Name contained in the rejected reissue.",
+                "xml": {
+                  "name": "san"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "OrderDetail": {
+      "type": "object",
+      "properties": {
+        "certificate_details": {
+          "type": "object",
+          "description": "Container for certificate details",
+          "properties": {
+            "order_id": {
+              "type": "integer",
+              "description": "Unique identifier for certificate order."
+            },
+            "status": {
+              "type": "string",
+              "description": "Status of order. Usually 'pending issuance' or 'issued'."
+            },
+            "product_name": {
+              "type": "string",
+              "description": "Product name of order."
+            },
+            "validity": {
+              "type": "integer",
+              "description": "Validity Period of order. Usually 1, 2 or 3 Year(s)."
+            },
+            "is_renewal": {
+              "type": "boolean",
+              "description": "Identifies the order as a renewal or new order. True if order is a renewal, false if order is new."
+            },
+            "renewed_order_id": {
+              "type": "integer",
+              "description": "If this order is a renewal of a previous order, returns the previous order's id in this parameter"
+            },
+            "org_unit": {
+              "type": "string",
+              "description": "The OU field of the certificate."
+            },
+            "business_unit": {
+              "type": "string",
+              "description": "The business unit that requested the certificate"
+            },
+            "common_name": {
+              "type": "string",
+              "description": "The Common Name field of the certificate."
+            },
+            "sans": {
+              "type": "array",
+              "description": "A collection that contains one or more SANs, (if any).",
+              "items": {
+                "type": "string",
+                "description": "A Subject Alternative Name (SAN) of the certificate.",
+                "xml": {
+                  "name": "san"
+                }
+              }
+            },
+            "order_date": {
+              "type": "string",
+              "description": "The date the original certificate was ordered. Format is d-M-Y"
+            },
+            "valid_from": {
+              "type": "string",
+              "description": "The start date of the certificate's validity (if issued). Format is d-M-Y"
+            },
+            "valid_till": {
+              "type": "string",
+              "description": "The end date of the certificate's validity (if issued). Format is d-M-Y"
+            },
+            "server_type": {
+              "type": "string",
+              "description": "The server software type of the order."
+            },
+            "server_type_name": {
+              "type": "string",
+              "description": "Name of the server software type of the order."
+            },
+            "site_seal_token": {
+              "type": "string",
+              "description": "Eight-character site seal token."
+            }
+          }
+        },
+        "pending_reissue": {
+          "type": "object",
+          "description": "If there is a pending reissue, this section will be populated.",
+          "properties": {
+            "common_name": {
+              "type": "string",
+              "description": "The Common Name in the current pending reissue."
+            },
+            "sans": {
+              "type": "array",
+              "description": "A collection that contains one or more SANs, (if any).",
+              "items": {
+                "type": "string",
+                "description": "A Subject Alternative Name (SAN) of the pending reissue.",
+                "xml": {
+                  "name": "san"
+                }
+              }
+            }
+          }
+        },
+        "receipt": {
+          "type": "object",
+          "description": "Once the certificate has been issued, a receipt is generated",
+          "properties": {
+            "order_total": {
+              "type": "number",
+              "description": "The total paid for the order"
+            }
+          }
+        }
+      }
+    },
+    "IssuedCertificate": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "integer",
+          "description": "Unique identifier for certificate order."
+        },
+        "serial": {
+          "type": "string",
+          "description": "The serial Number of the Certificate"
+        },
+        "certs": {
+          "type": "object",
+          "description": "A data set containing the certificates",
+          "properties": {
+            "certificate": {
+              "type": "string",
+              "description": "The certificate"
+            },
+            "intermediate": {
+              "type": "string",
+              "description": "The intermediate certificate"
+            },
+            "root": {
+              "type": "string",
+              "description": "The root certificate"
+            },
+            "pkcs7": {
+              "type": "string",
+              "description": "PKCS7 of the certificates"
+            }
+          }
+        }
+      }
+    }
+  }
+}
