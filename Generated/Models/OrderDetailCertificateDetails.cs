@@ -33,7 +33,7 @@ namespace DigiCertSharp.Models
         /// 'issued'.</param>
         /// <param name="productName">Product name of order.</param>
         /// <param name="validity">Validity Period of order. Usually 1, 2 or 3
-        /// Year(s).</param>
+        /// Year(s). Format is # Year(s)</param>
         /// <param name="isRenewal">Identifies the order as a renewal or new
         /// order. True if order is a renewal, false if order is new.</param>
         /// <param name="renewedOrderId">If this order is a renewal of a
@@ -58,7 +58,7 @@ namespace DigiCertSharp.Models
         /// the order.</param>
         /// <param name="siteSealToken">Eight-character site seal
         /// token.</param>
-        public OrderDetailCertificateDetails(int? orderId = default(int?), string status = default(string), string productName = default(string), int? validity = default(int?), bool? isRenewal = default(bool?), int? renewedOrderId = default(int?), string orgUnit = default(string), string businessUnit = default(string), string commonName = default(string), IList<string> sans = default(IList<string>), string orderDate = default(string), string validFrom = default(string), string validTill = default(string), string serverType = default(string), string serverTypeName = default(string), string siteSealToken = default(string))
+        public OrderDetailCertificateDetails(int? orderId = default(int?), string status = default(string), string productName = default(string), string validity = default(string), bool? isRenewal = default(bool?), int? renewedOrderId = default(int?), string orgUnit = default(string), string businessUnit = default(string), string commonName = default(string), IList<string> sans = default(IList<string>), string orderDate = default(string), string validFrom = default(string), string validTill = default(string), string serverType = default(string), string serverTypeName = default(string), string siteSealToken = default(string))
         {
             OrderId = orderId;
             Status = status;
@@ -105,9 +105,10 @@ namespace DigiCertSharp.Models
 
         /// <summary>
         /// Gets or sets validity Period of order. Usually 1, 2 or 3 Year(s).
+        /// Format is # Year(s)
         /// </summary>
         [JsonProperty(PropertyName = "validity")]
-        public int? Validity { get; set; }
+        public string Validity { get; set; }
 
         /// <summary>
         /// Gets or sets identifies the order as a renewal or new order. True

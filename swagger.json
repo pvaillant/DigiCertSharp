@@ -702,8 +702,8 @@
               "description": "Product name of order."
             },
             "validity": {
-              "type": "integer",
-              "description": "Validity Period of order. Usually 1, 2 or 3 Year(s)."
+              "type": "string",
+              "description": "Validity Period of order. Usually 1, 2 or 3 Year(s). Format is # Year(s)"
             },
             "is_renewal": {
               "type": "boolean",
