@@ -39,6 +39,19 @@ namespace DigiCertSharp
 
 
         /// <summary>
+        /// Retrieves current account information. This API call must be
+        /// specifically enabled by support request and isn't part of the
+        /// documented API.
+        /// </summary>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<GetAccountInfoOKResponse>> GetAccountInfoWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Create a pending order for a new SSL Certificate
         /// </summary>
         /// <param name='request'>

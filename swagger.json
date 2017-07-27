@@ -29,6 +29,42 @@
     "application/json"
   ],
   "paths": {
+    "/account": {
+      "get": {
+        "operationId": "GetAccountInfo",
+        "description": "Retrieves current account information. This API call must be specifically enabled by support request and isn't part of the documented API.",
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "title": "AccountInfo",
+              "type": "object",
+              "properties": {
+                "account_balance": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "api_permissions": {
+                  "title": "ApiPermissions",
+                  "type": "object",
+                  "properties": {
+                    "allow_ev": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "api_user_role": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/order/ssl": {
       "post": {
         "operationId": "OrderCertificate",

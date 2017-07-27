@@ -14,6 +14,36 @@ namespace DigiCertSharp
     public static partial class DigicertRetailAPIExtensions
     {
             /// <summary>
+            /// Retrieves current account information. This API call must be specifically
+            /// enabled by support request and isn't part of the documented API.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static GetAccountInfoOKResponse GetAccountInfo(this IDigicertRetailAPI operations)
+            {
+                return operations.GetAccountInfoAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Retrieves current account information. This API call must be specifically
+            /// enabled by support request and isn't part of the documented API.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<GetAccountInfoOKResponse> GetAccountInfoAsync(this IDigicertRetailAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetAccountInfoWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Create a pending order for a new SSL Certificate
             /// <see href="https://www.digicert.com/clients/rest/docs/retail/order/ssl-certificate" />
             /// </summary>
